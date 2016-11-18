@@ -14,6 +14,7 @@ var cache = require('gulp-cache');
 var del = require('del');
 var runSequence = require('run-sequence');
 var wiredep = require('wiredep').stream;
+var cssfont64 = require('gulp-cssfont64');
 
 gulp.task('bower', function () {
   gulp.src('app.index.html')
@@ -29,9 +30,14 @@ gulp.task('bower', function () {
 // Start browserSync server
 gulp.task('browserSync', function() {
   browserSync({
-    server: {
+      /*port: 3007,*/
+      proxy: {
+          target: 'localhost/opencartshop/app',
+          ws: true
+      },
+/*    server: {
       baseDir: 'app'
-    }
+    }*/
   })
 });
 
@@ -84,7 +90,12 @@ gulp.task('fonts', function() {
   return gulp.src('app/fonts/**/*')
       .pipe(gulp.dest('dist/fonts'))
 });
-
+gulp.task('fontsConvert', function () {
+    return gulp.src('app/fonts/*.{woff,woff2}')
+        .pipe(cssfont64())
+        .pipe(gulp.dest('app/scss/'))
+        .pipe(browserSync.stream());
+});
 // Cleaning 
 gulp.task('clean', function() {
   return del.sync('dist').then(function(cb) {
